@@ -1,0 +1,245 @@
+"use client";
+
+import { useRef, useState } from "react";
+import type { Analysis } from "@/lib/schema";
+import Results from "./results";
+
+type Shot = { id: string; name: string; preview: string; media_type: string; data: string };
+
+const MAX_EDGE = 1568;
+
+async function downscale(file: File): Promise<Shot> {
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result as string);
+    fr.onerror = () => reject(new Error("Couldn't read that file."));
+    fr.readAsDataURL(file);
+  });
+
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image();
+    el.onload = () => resolve(el);
+    el.onerror = () => reject(new Error("Couldn't open that image."));
+    el.src = dataUrl;
+  });
+
+  const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height));
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Couldn't process that image.");
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const out = canvas.toDataURL("image/jpeg", 0.85);
+  return {
+    id: crypto.randomUUID(),
+    name: file.name,
+    preview: out,
+    media_type: "image/jpeg",
+    data: out.split(",")[1],
+  };
+}
+
+export default function Analyzer() {
+  const [mode, setMode] = useState<"personal" | "work">("personal");
+  const [userSide, setUserSide] = useState("");
+  const [shots, setShots] = useState<Shot[]>([]);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const hasInput = shots.length > 0 || text.trim().length > 0;
+
+  async function addFiles(files: FileList | null) {
+    if (!files?.length) return;
+    setError(null);
+    try {
+      const next = await Promise.all(Array.from(files).map(downscale));
+      setShots((s) => [...s, ...next].slice(0, 20));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't add those images.");
+    }
+  }
+
+  async function analyse() {
+    setBusy(true);
+    setError(null);
+    setAnalysis(null);
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          mode,
+          userSide,
+          text,
+          images: shots.map(({ media_type, data }) => ({ media_type, data })),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Something went wrong.");
+      setAnalysis(json.analysis as Analysis);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (analysis) {
+    return (
+      <div className="flex w-full max-w-2xl flex-col gap-10 py-16">
+        <button
+          onClick={() => setAnalysis(null)}
+          className="self-start text-sm text-zinc-500 transition-colors hover:text-zinc-300"
+        >
+          ← Analyse another
+        </button>
+        <Results a={analysis} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full max-w-2xl flex-col gap-8 py-16">
+      <header className="flex flex-col gap-3">
+        <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">Manipucheck</h1>
+        <p className="leading-7 text-zinc-400">
+          Upload screenshots of a conversation, or paste the text. You&rsquo;ll get the specific
+          passages, what each one does to a conversation, and what you can do about it.
+        </p>
+      </header>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-sm text-zinc-400">What kind of conversation is this?</span>
+        <div className="flex gap-2">
+          {(["personal", "work"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`rounded-full border px-4 py-1.5 text-sm capitalize transition-colors ${
+                mode === m
+                  ? "border-zinc-400 bg-zinc-100 text-zinc-900"
+                  : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-zinc-600">
+          {mode === "work"
+            ? "Guidance will lean on documentation, written follow-ups and escalation paths."
+            : "Guidance will lean on what to expect, and what is and isn't within your control."}
+        </p>
+      </div>
+
+      <label className="flex flex-col gap-2">
+        <span className="text-sm text-zinc-400">
+          Which one are you? <span className="text-zinc-600">(optional)</span>
+        </span>
+        <input
+          value={userSide}
+          onChange={(e) => setUserSide(e.target.value)}
+          placeholder="e.g. the right-hand side, or your name in the thread"
+          className="rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
+        />
+        <span className="text-xs text-zinc-600">
+          Leave blank if you weren&rsquo;t part of the conversation.
+        </span>
+      </label>
+
+      <div className="flex flex-col gap-3">
+        <span className="text-sm text-zinc-400">Screenshots</span>
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="rounded-lg border border-dashed border-zinc-700 px-4 py-8 text-sm text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300"
+        >
+          {shots.length ? "Add more screenshots" : "Choose screenshots — you can select several"}
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          multiple
+          hidden
+          onChange={(e) => {
+            void addFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        {shots.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {shots.map((s) => (
+              <div key={s.id} className="group relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s.preview}
+                  alt={s.name}
+                  className="h-24 w-16 rounded border border-zinc-800 object-cover"
+                />
+                <button
+                  onClick={() => setShots((v) => v.filter((x) => x.id !== s.id))}
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-xs text-zinc-400 hover:text-zinc-100"
+                  aria-label={`Remove ${s.name}`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-xs text-zinc-600">
+          Order doesn&rsquo;t matter — timestamps and overlap are used to work it out. Up to 20 at
+          a time.
+        </p>
+      </div>
+
+      <label className="flex flex-col gap-2">
+        <span className="text-sm text-zinc-400">
+          Or paste the conversation <span className="text-zinc-600">(email threads work too)</span>
+        </span>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={8}
+          placeholder="Paste here…"
+          className="resize-y rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm leading-6 text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
+        />
+      </label>
+
+      {error && (
+        <p className="rounded-md border border-red-900/60 bg-red-950/30 px-4 py-3 text-sm text-red-200">
+          {error}
+        </p>
+      )}
+
+      <div className="flex flex-col gap-3">
+        <button
+          onClick={() => void analyse()}
+          disabled={!hasInput || busy}
+          className="rounded-full bg-zinc-100 px-6 py-3 text-sm font-medium text-zinc-900 transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          {busy ? "Reading the conversation…" : "Analyse"}
+        </button>
+        {busy && (
+          <p className="text-center text-xs text-zinc-600">
+            This takes up to a minute. Screenshots are read one by one.
+          </p>
+        )}
+      </div>
+
+      <p className="border-t border-zinc-900 pt-6 text-xs leading-5 text-zinc-600">
+        This reports observable patterns in what was written. It doesn&rsquo;t know anyone&rsquo;s
+        intentions, and it isn&rsquo;t a substitute for advice from someone who knows your
+        situation.
+      </p>
+    </div>
+  );
+}

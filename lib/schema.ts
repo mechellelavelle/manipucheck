@@ -1,0 +1,235 @@
+/**
+ * Structured output contract. Mirrors claude/Output-Design.md.
+ * The model is forced to return exactly this shape.
+ */
+
+export type Grade = "clear" | "arguable";
+export type Confidence = "HIGH" | "MEDIUM" | "LOW";
+export type Verdict =
+  | "patterns strongly present"
+  | "patterns present"
+  | "ambiguous"
+  | "not indicated";
+
+export interface Instance {
+  quote: string;
+  position: string;
+  grade: Grade;
+  marker: string;
+}
+
+export interface Finding {
+  speaker: string;
+  pattern: string;
+  plain_description: string;
+  mechanism: string;
+  instances: Instance[];
+  confidence: Confidence;
+  excluded_alternatives: string[];
+  part_of_loop: boolean;
+}
+
+export interface Analysis {
+  input_kind: "messaging" | "email" | "mixed";
+  chronology_note: string;
+  speakers: string[];
+  summary: string;
+  loop: { description: string; occurrences: string[] } | null;
+  findings: Finding[];
+  unanswered: { quote: string; asked_by: string; position: string }[];
+  per_speaker: { speaker: string; verdict: Verdict; arithmetic: string; note: string }[];
+  direction: "one-directional" | "reciprocal" | "neither indicated";
+  workability: {
+    repair_attempts: string;
+    responsiveness: string;
+    effect_of_deescalation: string;
+    distribution: string;
+  };
+  impact: { speaker: string; level: string; markers: string[] } | null;
+  where_this_leaves_you: string[];
+  approaches: { approach: string; produces: string; costs: string }[];
+  caveats: string[];
+  safety: { triggered: boolean; reasons: string[] };
+}
+
+const str = { type: "string" as const };
+const strArr = { type: "array" as const, items: str };
+
+export const ANALYSIS_TOOL = {
+  name: "report_analysis",
+  description:
+    "Report the completed analysis. Every field is required. Confidence values must be derived from the counting rules, never assigned by impression.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      input_kind: { type: "string", enum: ["messaging", "email", "mixed"] },
+      chronology_note: {
+        ...str,
+        description:
+          "How you determined message order, and whether the record appears complete. For email, state explicitly whether the thread was newest-first and whether quoted history was deduplicated.",
+      },
+      speakers: { ...strArr, description: "Names, or 'left'/'right' where names are not visible." },
+      summary: {
+        ...str,
+        description:
+          "Two or three sentences of plain language naming the shape of the exchange. No pattern jargon, no verdict.",
+      },
+      loop: {
+        type: ["object", "null"],
+        description:
+          "A repeating sequence, only if it occurs 2+ times. Null otherwise — never invent one.",
+        properties: {
+          description: str,
+          occurrences: { ...strArr, description: "Each occurrence, quoted." },
+        },
+        required: ["description", "occurrences"],
+      },
+      findings: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            speaker: str,
+            pattern: str,
+            plain_description: {
+              ...str,
+              description: "What happened, in plain words, before any category name.",
+            },
+            mechanism: {
+              ...str,
+              description:
+                "What this behaviour does to a conversation, independent of intent. The most valuable field — write it for someone deciding whether to keep engaging.",
+            },
+            instances: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  quote: str,
+                  position: str,
+                  grade: { type: "string", enum: ["clear", "arguable"] },
+                  marker: { ...str, description: "Which specific marker this satisfies." },
+                },
+                required: ["quote", "position", "grade", "marker"],
+              },
+            },
+            confidence: { type: "string", enum: ["HIGH", "MEDIUM", "LOW"] },
+            excluded_alternatives: {
+              ...strArr,
+              description: "Exclusion rules considered and rejected, and why.",
+            },
+            part_of_loop: { type: "boolean" },
+          },
+          required: [
+            "speaker",
+            "pattern",
+            "plain_description",
+            "mechanism",
+            "instances",
+            "confidence",
+            "excluded_alternatives",
+            "part_of_loop",
+          ],
+        },
+      },
+      unanswered: {
+        type: "array",
+        description: "Substantive questions visibly asked and never answered.",
+        items: {
+          type: "object",
+          properties: { quote: str, asked_by: str, position: str },
+          required: ["quote", "asked_by", "position"],
+        },
+      },
+      per_speaker: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            speaker: str,
+            verdict: {
+              type: "string",
+              enum: [
+                "patterns strongly present",
+                "patterns present",
+                "ambiguous",
+                "not indicated",
+              ],
+            },
+            arithmetic: { ...str, description: "Show the counts that produced the verdict." },
+            note: str,
+          },
+          required: ["speaker", "verdict", "arithmetic", "note"],
+        },
+      },
+      direction: {
+        type: "string",
+        enum: ["one-directional", "reciprocal", "neither indicated"],
+      },
+      workability: {
+        type: "object",
+        properties: {
+          repair_attempts: str,
+          responsiveness: str,
+          effect_of_deescalation: str,
+          distribution: str,
+        },
+        required: [
+          "repair_attempts",
+          "responsiveness",
+          "effect_of_deescalation",
+          "distribution",
+        ],
+      },
+      impact: {
+        type: ["object", "null"],
+        properties: {
+          speaker: str,
+          level: { type: "string", enum: ["evident", "possible", "not evident"] },
+          markers: strArr,
+        },
+        required: ["speaker", "level", "markers"],
+      },
+      where_this_leaves_you: {
+        ...strArr,
+        description:
+          "What tends to happen if nothing changes; what would have to change; what is and is not within this person's control. Never a recommendation.",
+      },
+      approaches: {
+        type: "array",
+        description: "Three, matched to context. Empty when safety.triggered is true.",
+        items: {
+          type: "object",
+          properties: { approach: str, produces: str, costs: str },
+          required: ["approach", "produces", "costs"],
+        },
+      },
+      caveats: {
+        ...strArr,
+        description: "Only caveats that actually apply to this record. Never boilerplate.",
+      },
+      safety: {
+        type: "object",
+        properties: { triggered: { type: "boolean" }, reasons: strArr },
+        required: ["triggered", "reasons"],
+      },
+    },
+    required: [
+      "input_kind",
+      "chronology_note",
+      "speakers",
+      "summary",
+      "loop",
+      "findings",
+      "unanswered",
+      "per_speaker",
+      "direction",
+      "workability",
+      "impact",
+      "where_this_leaves_you",
+      "approaches",
+      "caveats",
+      "safety",
+    ],
+  },
+};

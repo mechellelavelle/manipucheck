@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Manipucheck
 
-## Getting Started
+Analyses conversations for patterns associated with manipulation, against a defined
+rubric, and reports the specific passages rather than a verdict.
 
-First, run the development server:
+Live: https://manipucheck.vercel.app
+
+## How it fits together
+
+| File | What it is |
+|---|---|
+| `lib/rubric.ts` | The instrument — eight patterns, counting rules, exclusions, language rules. **This is the product.** |
+| `lib/schema.ts` | The structured output contract the model is forced to return |
+| `app/api/analyze/route.ts` | Endpoint: takes screenshots and/or text, calls the Claude API |
+| `app/analyzer.tsx` | The interface |
+| `app/results.tsx` | Renders the analysis |
+
+Design docs live in the Manipucheck project on claude.ai: `Operational-Rubric.md`
+(the instrument) and `Output-Design.md` (what the user sees). Keep `lib/rubric.ts`
+in sync with them.
+
+## Running locally
 
 ```bash
+cp .env.local.example .env.local   # then paste your key into it
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploying
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Vercel deploys `main` automatically. `ANTHROPIC_API_KEY` must be set in
+Project Settings → Environment Variables, for Production, Preview and Development.
 
-## Learn More
+## Notes
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Screenshots are downscaled in the browser before upload — phone screenshots are
+  far larger than the model needs, and full-size ones would exceed the request limit.
+- Speaker identity comes from bubble alignment in messaging screenshots, and from
+  sender headers in email. Email threads are frequently newest-first, and their
+  quoted history repeats earlier messages; both are handled in the prompt.
+- The system prompt is cached, so repeat analyses in quick succession cost less.
