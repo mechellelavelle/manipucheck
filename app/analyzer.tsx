@@ -112,7 +112,7 @@ export default function Analyzer() {
         <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">Manipucheck</h1>
         <p className="text-xl leading-8 text-zinc-200">
           Some conversations leave you confused about what just happened.
-          This shows you where that comes from.
+          This shows you exactly what produced it.
         </p>
         <p className="leading-7 text-zinc-400">
           Upload the screenshots or paste the thread. You&rsquo;ll get the specific lines, what
@@ -201,7 +201,7 @@ export default function Analyzer() {
           </div>
         )}
         <p className="text-xs text-zinc-600">
-          Order doesn&rsquo;t matter — timestamps and overlap are used to work it out. Up to 20 at
+          Order doesn&rsquo;t matter — timestamps and overlap determine the sequence. Up to 20 at
           a time.
         </p>
       </div>

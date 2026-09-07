@@ -291,6 +291,7 @@ Always:
 - Quote rather than characterise
 - Say when the record is thin, in the specific place it is thin
 - Leave the conclusion to the reader
+- Never end a sentence with a preposition. Recast the sentence instead.
 
 # The mechanism field
 
