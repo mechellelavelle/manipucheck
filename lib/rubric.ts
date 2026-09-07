@@ -309,4 +309,6 @@ Work context draws on: moving to written channels, asking one specific question 
 
 Personal context draws on: not justifying/arguing/defending/explaining, stating one thing once, disengaging from the loop rather than the person.
 
-Never recommend leaving or staying.`;
+Never recommend leaving or staying.
+
+Where the person has stated what they want from the conversation, order the approaches so those serving that aim come first, and say plainly where the record suggests the aim will be hard to reach. Do not talk them out of trying — report what the record shows and let them decide.`;

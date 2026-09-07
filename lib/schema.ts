@@ -233,3 +233,40 @@ export const ANALYSIS_TOOL = {
     ],
   },
 };
+
+export interface ResponseDraft {
+  goal_assessment: string;
+  draft: string;
+  notes: string[];
+  omitted: string[];
+}
+
+export const RESPOND_TOOL = {
+  name: "report_draft",
+  description: "Report the drafted reply. Every field is required.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      goal_assessment: {
+        type: "string",
+        description:
+          "What the record suggests about whether this goal is reachable in this conversation. Honest, not discouraging.",
+      },
+      draft: {
+        type: "string",
+        description: "The message, ready to copy and edit.",
+      },
+      notes: {
+        type: "array",
+        items: { type: "string" },
+        description: "Two to four short items on why the parts are there.",
+      },
+      omitted: {
+        type: "array",
+        items: { type: "string" },
+        description: "What the draft deliberately leaves out, and why.",
+      },
+    },
+    required: ["goal_assessment", "draft", "notes", "omitted"],
+  },
+};

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { Analysis } from "@/lib/schema";
 import Results from "./results";
+import RespondPanel from "./respond-panel";
 
 type Shot = { id: string; name: string; preview: string; media_type: string; data: string };
 
@@ -47,6 +48,7 @@ async function downscale(file: File): Promise<Shot> {
 export default function Analyzer() {
   const [mode, setMode] = useState<"personal" | "work">("personal");
   const [userSide, setUserSide] = useState("");
+  const [goal, setGoal] = useState("");
   const [shots, setShots] = useState<Shot[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -78,6 +80,7 @@ export default function Analyzer() {
         body: JSON.stringify({
           mode,
           userSide,
+          goal,
           text,
           images: shots.map(({ media_type, data }) => ({ media_type, data })),
         }),
@@ -102,6 +105,12 @@ export default function Analyzer() {
           ← Analyse another
         </button>
         <Results a={analysis} />
+        <RespondPanel analysis={analysis} mode={mode} text={text} initialGoal={goal} />
+      <p className="border-t border-zinc-900 pt-6 text-xs leading-5 text-zinc-600">
+        Manipucheck reports observable patterns in what was written. It is not therapy, not a
+        mental-health assessment, and not medical or legal advice. It does not know anyone&rsquo;s
+        intentions. For anything that matters, talk with a professional who knows your situation.
+      </p>
       </div>
     );
   }
@@ -116,7 +125,8 @@ export default function Analyzer() {
         </p>
         <p className="leading-7 text-zinc-400">
           Upload the screenshots or paste the thread. You&rsquo;ll get the specific lines, what
-          each one is doing to the conversation, and the exact words behind every finding.
+          each one is doing to the conversation, the exact words behind every finding &mdash; and
+          a reply you can actually send.
         </p>
       </header>
 
@@ -156,6 +166,22 @@ export default function Analyzer() {
         />
         <span className="text-xs text-zinc-600">
           Leave blank if you weren&rsquo;t part of the conversation.
+        </span>
+      </label>
+
+      <label className="flex flex-col gap-2">
+        <span className="text-sm text-zinc-400">
+          What do you want from this conversation?{" "}
+          <span className="text-zinc-600">(optional)</span>
+        </span>
+        <input
+          value={goal}
+          onChange={(e) => setGoal(e.target.value)}
+          placeholder="e.g. an acknowledgement, without another argument"
+          className="rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
+        />
+        <span className="text-xs text-zinc-600">
+          Used to tailor the reply. You can change it once you&rsquo;ve read the analysis.
         </span>
       </label>
 
@@ -240,9 +266,9 @@ export default function Analyzer() {
       </div>
 
       <p className="border-t border-zinc-900 pt-6 text-xs leading-5 text-zinc-600">
-        This reports observable patterns in what was written. It doesn&rsquo;t know anyone&rsquo;s
-        intentions, and it isn&rsquo;t a substitute for advice from someone who knows your
-        situation.
+        Manipucheck reports observable patterns in what was written. It is not therapy, not a
+        mental-health assessment, and not medical or legal advice. It does not know anyone&rsquo;s
+        intentions. For anything that matters, talk with a professional who knows your situation.
       </p>
     </div>
   );

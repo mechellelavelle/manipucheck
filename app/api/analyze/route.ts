@@ -26,6 +26,7 @@ export async function POST(req: Request) {
   let body: {
     mode?: string;
     userSide?: string;
+    goal?: string;
     text?: string;
     images?: ImageInput[];
   };
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
 
   const mode = body.mode === "work" ? "work" : "personal";
   const userSide = (body.userSide ?? "").trim();
+  const goal = (body.goal ?? "").trim().slice(0, 2000);
   const text = (body.text ?? "").trim();
   const images = Array.isArray(body.images) ? body.images : [];
 
@@ -101,9 +103,13 @@ export async function POST(req: Request) {
     ? `The person requesting this analysis is: ${userSide}. Address them directly as "you" where natural, and use this to determine which questions went unanswered and whether impact markers apply.`
     : `The person requesting this analysis has not said which speaker they are, or is not a participant. Write in the third person and omit the impact section.`;
 
+  const goalLine = goal
+    ? `What they want from this conversation: ${goal}. Order the approaches so the ones serving this goal come first, and say plainly where the record suggests this goal is hard to reach here.`
+    : `They have not said what they want from this conversation. Offer approaches covering the range of common aims.`;
+
   content.push({
     type: "text",
-    text: `Context: this is a ${mode} conversation. ${sideLine}\n\nAnalyse it using the rubric and report through the report_analysis tool.`,
+    text: `Context: this is a ${mode} conversation. ${sideLine}\n\n${goalLine}\n\nAnalyse it using the rubric and report through the report_analysis tool.`,
   });
 
   const client = new Anthropic({ apiKey });
