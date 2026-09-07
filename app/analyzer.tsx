@@ -111,13 +111,12 @@ export default function Analyzer() {
       <header className="flex flex-col gap-3">
         <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">Manipucheck</h1>
         <p className="text-xl leading-8 text-zinc-200">
-          Some conversations leave you confused about what just happened.
-          This shows you exactly what produced it.
+          Stop replaying the conversation in your head. Manipucheck goes through it line by
+          line and shows you what actually happened &mdash; in their own words.
         </p>
         <p className="leading-7 text-zinc-400">
           Upload the screenshots or paste the thread. You&rsquo;ll get the specific lines, what
-          each one is doing to the conversation, and the exact words behind every finding &mdash;
-          so you can judge the reasoning yourself.
+          each one is doing to the conversation, and the exact words behind every finding.
         </p>
       </header>
 
