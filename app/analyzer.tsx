@@ -111,8 +111,8 @@ export default function Analyzer() {
       <header className="flex flex-col gap-3">
         <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">Manipucheck</h1>
         <p className="leading-7 text-zinc-400">
-          Upload screenshots of a conversation, or paste the text. You&rsquo;ll get the specific
-          passages, what each one does to a conversation, and what you can do about it.
+          Upload screenshots or paste an email thread. Every finding is tied to the exact words
+          that produced it &mdash; so you can see the reasoning, and judge it yourself.
         </p>
       </header>
 
