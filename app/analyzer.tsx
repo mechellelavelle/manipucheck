@@ -109,10 +109,15 @@ export default function Analyzer() {
   return (
     <div className="flex w-full max-w-2xl flex-col gap-8 py-16">
       <header className="flex flex-col gap-3">
-        <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">Manipucheck</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">Manipucheck</h1>
+        <p className="text-xl leading-8 text-zinc-200">
+          Some conversations leave you confused about what just happened.
+          This shows you where that comes from.
+        </p>
         <p className="leading-7 text-zinc-400">
-          Upload screenshots or paste an email thread. Every finding is tied to the exact words
-          that produced it &mdash; so you can see the reasoning, and judge it yourself.
+          Upload the screenshots or paste the thread. You&rsquo;ll get the specific lines, what
+          each one is doing to the conversation, and the exact words behind every finding &mdash;
+          so you can judge the reasoning yourself.
         </p>
       </header>
 
