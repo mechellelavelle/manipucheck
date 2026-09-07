@@ -16,6 +16,11 @@ export default function Home() {
           not guesswork.
         </p>
 
+        <p className="text-sm leading-6 text-zinc-500">
+          Eight defined patterns. Consistent criteria. Every finding shows the
+          passage it came from.
+        </p>
+
         <p className="text-sm text-zinc-600">
           For business and personal conversations.
         </p>
