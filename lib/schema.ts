@@ -46,6 +46,12 @@ export interface Analysis {
     distribution: string;
   };
   impact: { speaker: string; level: string; markers: string[] } | null;
+  alternative_read: {
+    what_happened: string;
+    divergence_point: string;
+    each_side: { speaker: string; appeared_to_think: string }[];
+    what_would_have_helped: string;
+  } | null;
   where_this_leaves_you: string[];
   approaches: { approach: string; produces: string; costs: string }[];
   caveats: string[];
@@ -190,6 +196,25 @@ export const ANALYSIS_TOOL = {
         },
         required: ["speaker", "level", "markers"],
       },
+      alternative_read: {
+        type: ["object", "null"],
+        description:
+          "Required when no speaker reaches 'patterns present'. What is actually happening, if it is not manipulation. Null otherwise.",
+        properties: {
+          what_happened: str,
+          divergence_point: { ...str, description: "Quote the message where meaning diverged." },
+          each_side: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: { speaker: str, appeared_to_think: str },
+              required: ["speaker", "appeared_to_think"],
+            },
+          },
+          what_would_have_helped: str,
+        },
+        required: ["what_happened", "divergence_point", "each_side", "what_would_have_helped"],
+      },
       where_this_leaves_you: {
         ...strArr,
         description:
@@ -226,6 +251,7 @@ export const ANALYSIS_TOOL = {
       "direction",
       "workability",
       "impact",
+      "alternative_read",
       "where_this_leaves_you",
       "approaches",
       "caveats",

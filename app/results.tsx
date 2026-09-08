@@ -71,6 +71,38 @@ export default function Results({ a }: { a: Analysis }) {
         </Section>
       )}
 
+      {a.alternative_read && (
+        <Section
+          title="Where it went sideways"
+          blurb="No manipulation patterns reached the threshold here. This is what happened instead."
+        >
+          <p className="leading-7 text-zinc-300">{a.alternative_read.what_happened}</p>
+
+          <div className="mt-5">
+            <p className="text-sm text-zinc-500">The point where you stopped discussing the same thing</p>
+            <div className="mt-2">
+              <Quote>{a.alternative_read.divergence_point}</Quote>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-col gap-3">
+            {a.alternative_read.each_side.map((e, i) => (
+              <div key={i}>
+                <p className="text-sm font-medium text-zinc-300">{e.speaker} appeared to think</p>
+                <p className="mt-1 text-sm leading-6 text-zinc-400">{e.appeared_to_think}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 rounded-md bg-zinc-900/60 p-4">
+            <p className="text-sm text-zinc-500">What would have prevented it</p>
+            <p className="mt-1 text-sm leading-6 text-zinc-400">
+              {a.alternative_read.what_would_have_helped}
+            </p>
+          </div>
+        </Section>
+      )}
+
       {a.findings.length > 0 && (
         <Section
           title="Passage by passage"
