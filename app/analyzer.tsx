@@ -102,7 +102,7 @@ export default function Analyzer() {
           onClick={() => setAnalysis(null)}
           className="self-start text-sm text-zinc-500 transition-colors hover:text-zinc-300"
         >
-          ← Analyse another
+          ← Look at another one
         </button>
         <Results a={analysis} />
         <RespondPanel analysis={analysis} mode={mode} text={text} initialGoal={goal} />
@@ -156,7 +156,7 @@ export default function Analyzer() {
 
       <label className="flex flex-col gap-2">
         <span className="text-sm text-zinc-400">
-          Which one are you? <span className="text-zinc-600">(optional)</span>
+          Which side is yours? <span className="text-zinc-600">(optional)</span>
         </span>
         <input
           value={userSide}
@@ -165,23 +165,22 @@ export default function Analyzer() {
           className="rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
         />
         <span className="text-xs text-zinc-600">
-          Leave blank if you weren&rsquo;t part of the conversation.
+          Leave this blank if you weren&rsquo;t part of it.
         </span>
       </label>
 
       <label className="flex flex-col gap-2">
         <span className="text-sm text-zinc-400">
-          What do you want from this conversation?{" "}
-          <span className="text-zinc-600">(optional)</span>
+          What were you hoping for? <span className="text-zinc-600">(optional)</span>
         </span>
         <input
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
-          placeholder="e.g. an acknowledgement, without another argument"
+          placeholder="e.g. just an acknowledgement, without it turning into a fight"
           className="rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
         />
         <span className="text-xs text-zinc-600">
-          Used to tailor the reply. You can change it once you&rsquo;ve read the analysis.
+          Shapes the reply we draft for you. You can change it later.
         </span>
       </label>
 
@@ -191,7 +190,7 @@ export default function Analyzer() {
           onClick={() => fileRef.current?.click()}
           className="rounded-lg border border-dashed border-zinc-700 px-4 py-8 text-sm text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300"
         >
-          {shots.length ? "Add more screenshots" : "Choose screenshots — you can select several"}
+          {shots.length ? "Add more screenshots" : "Choose screenshots — you can pick several at once"}
         </button>
         <input
           ref={fileRef}
@@ -256,11 +255,11 @@ export default function Analyzer() {
           disabled={!hasInput || busy}
           className="rounded-full bg-zinc-100 px-6 py-3 text-sm font-medium text-zinc-900 transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
         >
-          {busy ? "Reading the conversation…" : "Analyse"}
+          {busy ? "Reading it through…" : "Read the conversation"}
         </button>
         {busy && (
           <p className="text-center text-xs text-zinc-600">
-            This takes up to a minute. Screenshots are read one by one.
+            About a minute. Screenshots are read one at a time.
           </p>
         )}
       </div>
