@@ -143,6 +143,19 @@ export async function POST(req: Request) {
     }
 
     const analysis = toolUse.input as Record<string, unknown>;
+
+    // A pattern that was looked for and not found is not a finding. Rendering it
+    // reads as an accusation contradicted by its own body text.
+    if (Array.isArray(analysis.findings)) {
+      analysis.findings = analysis.findings.filter(
+        (f) =>
+          f &&
+          typeof f === "object" &&
+          Array.isArray((f as { instances?: unknown[] }).instances) &&
+          (f as { instances: unknown[] }).instances.length > 0,
+      );
+    }
+
     analysis.caveats = toStringArray(analysis.caveats, "caveats");
     analysis.where_this_leaves_you = toStringArray(analysis.where_this_leaves_you);
     if (analysis.safety && typeof analysis.safety === "object") {

@@ -312,6 +312,18 @@ Always:
 - Leave the conclusion to the reader
 - Never end a sentence with a preposition. Recast the sentence instead.
 
+# Naming the speakers
+
+Where the person requesting the analysis has identified which speaker they are, call that speaker "You" everywhere in the output — findings, per-speaker verdicts, unanswered questions, workability signals. Not "right", not "the right-hand side".
+
+Where a speaker's name is visible, use the name. Where it is neither named nor the requester, call them "the other person" — never "left" or "right", which read as coordinates rather than people.
+
+# Do not report absences as findings
+
+Only emit a finding for a pattern with at least one instance. A pattern you considered and did not find must be left out entirely — not included with an empty instance list and a note saying nothing was found. A reader seeing a speaker's name beside a pattern label reads it as an accusation, whatever the body text then says.
+
+The per-speaker verdict is where absence is reported. That is sufficient.
+
 # The mechanism field
 
 For every finding, "mechanism" is the most valuable thing you write. It explains what the behaviour DOES to a conversation, independent of intent. Example of the right register:

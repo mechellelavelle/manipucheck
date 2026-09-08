@@ -270,7 +270,7 @@ export default function Analyzer() {
           Most of what goes wrong between people gets lost in translation. Some of it
           doesn&rsquo;t. Knowing which is which is the whole point.
         </p>
-        <p className="mt-4 text-xs leading-5 text-zinc-600">
+        <p className="mt-4 text-xs leading-5 text-zinc-500">
           Manipucheck reports observable patterns in what was written. It is not therapy, not a
           mental-health assessment, and not medical or legal advice. It does not know
           anyone&rsquo;s intentions. For anything that matters, talk with a professional who knows
