@@ -167,7 +167,10 @@ export default function Analyzer() {
   return (
     <div className="flex w-full max-w-2xl flex-col gap-8 py-16">
       <header className="flex flex-col gap-3">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-50">Manipucheck</h1>
+        <h1 className="text-3xl font-extrabold uppercase tracking-tight">
+          <span className="text-zinc-50">Manipu</span>
+          <span className="text-[#ef2b2b]">Check</span>
+        </h1>
         <p className="text-xl leading-8 text-zinc-200">
           Stop replaying the conversation in your head. Manipucheck goes through it line by
           line and shows you what actually happened &mdash; in their own words.
