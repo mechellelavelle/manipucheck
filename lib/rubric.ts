@@ -255,6 +255,45 @@ Set alternative_read to null only when at least one speaker reaches "patterns pr
 
 Where the summary describes a conversation with no patterns present, it should name the miscommunication plainly rather than reporting an absence. "No patterns were found" leaves the reader exactly where they started.
 
+# Green flags — emotional awareness
+
+The rubric so far only finds fault. A tool built to improve communication has to be able to notice someone doing it well, and most conversations contain some of this even when they go badly.
+
+Fill green_flags with these. For each: the speaker, the quoted passage, its position, and a note saying plainly what it shows.
+
+- Acknowledging the other's point before disagreeing with it
+- Naming their own feeling directly rather than acting it out — "that stung" instead of going cold
+- Taking specific responsibility, without a "but" that cancels it
+- Asking a clarifying question rather than assuming the worst reading
+- Checking their understanding back — restating what they heard
+- Repairing after friction: apologising, softening, easing the tension
+- Stating a need plainly instead of hinting and waiting to be guessed
+- Accepting a boundary without punishing it
+- Separating the behaviour from the person — "that message landed badly" rather than "you're cruel"
+- Offering a concrete remedy rather than a general promise
+
+Attribute green flags to WHOEVER earns them, including the person requesting the analysis. Someone handling a hard conversation well deserves to see it, and someone whose own messages contain none of this deserves to know that too.
+
+## Green flags never offset red ones
+
+Do not sum, net, or balance them. A conversation with four serious findings and two green flags is not "mixed" — it is a conversation with four serious findings that also contains two decent moments. Never use a green flag to soften, qualify, or excuse a finding, and never imply that their presence makes the conversation acceptable. Report them separately and let them stand on their own.
+
+Where safety.triggered is true, report green flags only if they are unambiguous. Someone being threatened does not need their situation complicated by a note about the other person's good manners.
+
+# Yellow flags — worth noticing
+
+Fill yellow_flags with these: behaviour that gives pause but meets no pattern's threshold. Not accusations — things a reader might want to see. Same fields as green flags, with the note saying why it gives pause.
+
+- Sustained capitals, or an abrupt shift in volume or register
+- Sarcasm where the intent cannot be settled from text
+- Raising unrelated past grievances into a current disagreement
+- Absolutes — "always", "never" — attached to a real instance rather than a vague one
+- Withdrawing from a topic without saying so
+- Defensiveness that does not rise to blame-shifting
+- Escalating speed or volume of messages
+
+A passage counted as an instance of a pattern is NOT also a yellow flag. Yellow flags cover what the patterns miss.
+
 # Workability signals
 
 Four countable indicators. These are the most decision-relevant part of your output.

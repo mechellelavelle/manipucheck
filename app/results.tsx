@@ -1,4 +1,4 @@
-import type { Analysis, Confidence } from "@/lib/schema";
+import type { Analysis, Confidence, Flag } from "@/lib/schema";
 
 /* Collapsible section. Native <details> — no JS, keyboard accessible. */
 function Fold({
@@ -39,6 +39,49 @@ function Quote({ children }: { children: React.ReactNode }) {
   );
 }
 
+function Pill({
+  tone,
+  count,
+  label,
+}: {
+  tone: "red" | "amber" | "green";
+  count: number;
+  label: string;
+}) {
+  const styles = {
+    red: "border-red-900/70 bg-red-950/40 text-red-300",
+    amber: "border-amber-900/70 bg-amber-950/40 text-amber-300",
+    green: "border-emerald-900/70 bg-emerald-950/40 text-emerald-300",
+  }[tone];
+  const dot = { red: "bg-red-400", amber: "bg-amber-400", green: "bg-emerald-400" }[tone];
+  return (
+    <span
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm ${styles}`}
+    >
+      <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} aria-hidden />
+      <span className="font-medium tabular-nums">{count}</span>
+      <span className="opacity-80">{label}</span>
+    </span>
+  );
+}
+
+function FlagList({ flags, tone }: { flags: Flag[]; tone: "amber" | "green" }) {
+  const bar = tone === "green" ? "border-emerald-800/70" : "border-amber-800/70";
+  return (
+    <ul className="flex flex-col gap-4">
+      {flags.map((f, i) => (
+        <li key={i} className={`border-l-2 pl-4 ${bar}`}>
+          <p className="text-[15px] leading-7 text-zinc-300">{f.quote}</p>
+          <p className="mt-1 text-sm leading-6 text-zinc-400">{f.note}</p>
+          <p className="mt-1 text-xs text-zinc-600">
+            {f.speaker} · {f.position}
+          </p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 const chip: Record<Confidence, string> = {
   HIGH: "border-zinc-500 bg-zinc-800/60 text-zinc-200",
   MEDIUM: "border-zinc-700 text-zinc-400",
@@ -53,6 +96,11 @@ const verdictTone: Record<string, string> = {
 };
 
 export default function Results({ a }: { a: Analysis }) {
+  const green = a.green_flags ?? [];
+  const yellowExtra = a.yellow_flags ?? [];
+  const redCount = a.findings.filter((f) => f.confidence !== "LOW").length;
+  const yellowCount = a.findings.filter((f) => f.confidence === "LOW").length + yellowExtra.length;
+
   const signals = [
     ["Does anyone try to repair it?", a.workability.repair_attempts],
     ["Do questions get answered?", a.workability.responsiveness],
@@ -77,6 +125,22 @@ export default function Results({ a }: { a: Analysis }) {
             next message — when a conversation looks like this, careful phrasing can raise the
             risk rather than lower it.
           </p>
+        </div>
+      )}
+
+      {(redCount > 0 || yellowCount > 0 || green.length > 0) && (
+        <div className="mb-8 flex flex-wrap gap-2">
+          {redCount > 0 && (
+            <Pill tone="red" count={redCount} label={redCount === 1 ? "red flag" : "red flags"} />
+          )}
+          {yellowCount > 0 && <Pill tone="amber" count={yellowCount} label="worth noticing" />}
+          {green.length > 0 && (
+            <Pill
+              tone="green"
+              count={green.length}
+              label={green.length === 1 ? "green flag" : "green flags"}
+            />
+          )}
         </div>
       )}
 
@@ -169,7 +233,9 @@ export default function Results({ a }: { a: Analysis }) {
               {a.findings.map((f, i) => (
                 <article
                   key={i}
-                  className="rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-5"
+                  className={`rounded-lg border border-l-2 border-zinc-800/80 bg-zinc-900/30 p-5 ${
+                    f.confidence === "LOW" ? "border-l-amber-700/70" : "border-l-red-800/80"
+                  }`}
                 >
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <span className="text-sm font-medium text-zinc-200">{f.speaker}</span>
@@ -201,6 +267,27 @@ export default function Results({ a }: { a: Analysis }) {
                 </article>
               ))}
             </div>
+          </Fold>
+        )}
+
+        {yellowExtra.length > 0 && (
+          <Fold
+            title="Worth noticing"
+            count={yellowExtra.length}
+            blurb="Below the threshold for a pattern, but you may want to see it."
+          >
+            <FlagList flags={yellowExtra} tone="amber" />
+          </Fold>
+        )}
+
+        {green.length > 0 && (
+          <Fold
+            title="What went well"
+            count={green.length}
+            blurb="Moments of real emotional awareness. These don't cancel anything above — they just also happened."
+            open
+          >
+            <FlagList flags={green} tone="green" />
           </Fold>
         )}
 

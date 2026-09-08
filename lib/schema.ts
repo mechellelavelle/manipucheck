@@ -29,6 +29,13 @@ export interface Finding {
   part_of_loop: boolean;
 }
 
+export interface Flag {
+  speaker: string;
+  quote: string;
+  position: string;
+  note: string;
+}
+
 export interface Analysis {
   input_kind: "messaging" | "email" | "mixed";
   chronology_note: string;
@@ -36,6 +43,8 @@ export interface Analysis {
   summary: string;
   loop: { description: string; occurrences: string[] } | null;
   findings: Finding[];
+  green_flags: Flag[];
+  yellow_flags: Flag[];
   unanswered: { quote: string; asked_by: string; position: string }[];
   per_speaker: { speaker: string; verdict: Verdict; arithmetic: string; note: string }[];
   direction: "one-directional" | "reciprocal" | "neither indicated";
@@ -136,6 +145,36 @@ export const ANALYSIS_TOOL = {
             "excluded_alternatives",
             "part_of_loop",
           ],
+        },
+      },
+      green_flags: {
+        type: "array",
+        description:
+          "Moments of emotional awareness, attributed to whoever earned them. Never offset or soften a finding.",
+        items: {
+          type: "object",
+          properties: {
+            speaker: str,
+            quote: str,
+            position: str,
+            note: { ...str, description: "What this shows, in one plain sentence." },
+          },
+          required: ["speaker", "quote", "position", "note"],
+        },
+      },
+      yellow_flags: {
+        type: "array",
+        description:
+          "Worth noticing, but below any pattern threshold. Never a passage already counted as an instance.",
+        items: {
+          type: "object",
+          properties: {
+            speaker: str,
+            quote: str,
+            position: str,
+            note: { ...str, description: "Why it gives pause, in one plain sentence." },
+          },
+          required: ["speaker", "quote", "position", "note"],
         },
       },
       unanswered: {
@@ -246,6 +285,8 @@ export const ANALYSIS_TOOL = {
       "summary",
       "loop",
       "findings",
+      "green_flags",
+      "yellow_flags",
       "unanswered",
       "per_speaker",
       "direction",
