@@ -2,7 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { RESPOND_PROMPT } from "@/lib/respond";
 import { RESPOND_TOOL } from "@/lib/schema";
-import type { Analysis } from "@/lib/schema";
+import type { Analysis, ResponseDraft } from "@/lib/schema";
+import { toStringArray, toPlainString } from "@/lib/normalize";
 
 export const maxDuration = 120;
 
@@ -84,7 +85,20 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ draft: toolUse.input });
+    const raw = toolUse.input as Record<string, unknown>;
+    const draft: ResponseDraft = {
+      goal_assessment: toPlainString(raw.goal_assessment),
+      draft: toPlainString(raw.draft),
+      notes: toStringArray(raw.notes, "notes"),
+      omitted: toStringArray(raw.omitted, "omitted"),
+    };
+
+    // The omitted section sometimes arrives inside notes instead of its own field.
+    if (!draft.omitted.length && typeof raw.notes === "string") {
+      draft.omitted = toStringArray(raw.notes, "omitted");
+    }
+
+    return NextResponse.json({ draft });
   } catch (err) {
     const status =
       err instanceof Anthropic.APIError && typeof err.status === "number" ? err.status : 500;

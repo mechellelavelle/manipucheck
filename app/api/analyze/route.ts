@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { SYSTEM_PROMPT } from "@/lib/rubric";
 import { ANALYSIS_TOOL } from "@/lib/schema";
+import { toStringArray } from "@/lib/normalize";
 
 export const maxDuration = 300;
 
@@ -141,8 +142,16 @@ export async function POST(req: Request) {
       );
     }
 
+    const analysis = toolUse.input as Record<string, unknown>;
+    analysis.caveats = toStringArray(analysis.caveats, "caveats");
+    analysis.where_this_leaves_you = toStringArray(analysis.where_this_leaves_you);
+    if (analysis.safety && typeof analysis.safety === "object") {
+      const s = analysis.safety as Record<string, unknown>;
+      s.reasons = toStringArray(s.reasons, "reasons");
+    }
+
     return NextResponse.json({
-      analysis: toolUse.input,
+      analysis,
       usage: {
         input_tokens: message.usage.input_tokens,
         output_tokens: message.usage.output_tokens,
