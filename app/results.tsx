@@ -323,6 +323,50 @@ export default function Results({ a }: { a: Analysis }) {
           </Fold>
         )}
 
+        {a.your_side && (
+          <Fold
+            title="Your side of it"
+            blurb="What served you, and what would have given you more footing."
+            open
+          >
+            {a.your_side.worked.length > 0 && (
+              <div className="mb-6">
+                <p className="text-sm text-zinc-500">What served you</p>
+                <ul className="mt-2 flex flex-col gap-2">
+                  {a.your_side.worked.map((w, i) => (
+                    <li
+                      key={i}
+                      className="border-l-2 border-emerald-800/70 pl-4 text-[15px] leading-7 text-zinc-300"
+                    >
+                      {w}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {a.your_side.could_try.length > 0 && (
+              <div className="mb-6 flex flex-col gap-4">
+                <p className="text-sm text-zinc-500">Worth trying instead</p>
+                {a.your_side.could_try.map((c, i) => (
+                  <div key={i} className="rounded-lg border border-zinc-800/80 p-4">
+                    <Quote>{c.quote}</Quote>
+                    <p className="mt-3 text-[15px] leading-7 text-zinc-300">{c.instead}</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">{c.why}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="rounded-md border border-zinc-700/60 bg-zinc-900/60 p-4">
+              <p className="text-sm text-zinc-500">Not yours to fix</p>
+              <p className="mt-1 text-[15px] leading-7 text-zinc-300">
+                {a.your_side.not_yours_to_fix}
+              </p>
+            </div>
+          </Fold>
+        )}
+
         {a.where_this_leaves_you.length > 0 && (
           <Fold title="Where this leaves you" open>
             <ul className="flex flex-col gap-3">

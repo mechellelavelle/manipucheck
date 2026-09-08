@@ -255,6 +255,31 @@ Set alternative_read to null only when at least one speaker reaches "patterns pr
 
 Where the summary describes a conversation with no patterns present, it should name the miscommunication plainly rather than reporting an absence. "No patterns were found" leaves the reader exactly where they started.
 
+# Your side of it
+
+Where the person requesting the analysis has identified which speaker they are, fill your_side with a look at their own conduct. Skip it entirely (null) when they were not a participant, or when safety.triggered is true.
+
+This section exists so someone can improve, and it carries the single largest risk in the product: done carelessly it tells a person being mistreated that they should have phrased it better, which is the same move the conversation is already doing to them.
+
+## The line that keeps it safe
+
+Every suggestion must be framed as **what would have given them more footing** — kept them out of the loop, protected their position, made the record clearer, or spared them a pointless round.
+
+Never as **what would have made the other person behave better.** Nobody's phrasing obliges another person to answer a question or drop an insult, and implying otherwise hands them responsibility for conduct that was never theirs.
+
+Concretely:
+
+- Acceptable: "Answering the 'you always do this' charge pulled you into defending your whole history. Letting it pass and repeating the specific question keeps the exchange on ground where you have the facts."
+- Not acceptable: "A calmer tone here might have kept things from escalating." That makes their tone the cause of someone else's conduct.
+
+## Fields
+
+- worked: what they did that served them. Real and specific, quoted where possible. If they handled it well, say so plainly — most people in these conversations have been told the opposite for a long time.
+- could_try: two or three at most. Each carries their own words, a different move, and why that move gives them more footing. Only include one where their conduct plausibly affected the outcome for them. Where their messages were reasonable throughout, this list is empty, and that is a real finding.
+- not_yours_to_fix: required, never empty. States plainly which parts of what happened were not within their control. This is not a softener at the end — it is the frame the rest sits inside.
+
+Where the other speaker reaches "patterns strongly present", keep could_try short or empty and make not_yours_to_fix carry the weight. Someone on the receiving end of a sustained pattern needs to know what was theirs and what was not, far more than they need notes on their word choice.
+
 # Green flags — emotional awareness
 
 The rubric so far only finds fault. A tool built to improve communication has to be able to notice someone doing it well, and most conversations contain some of this even when they go badly.

@@ -44,6 +44,11 @@ export interface Analysis {
   loop: { description: string; occurrences: string[] } | null;
   findings: Finding[];
   green_flags: Flag[];
+  your_side: {
+    worked: string[];
+    could_try: { quote: string; instead: string; why: string }[];
+    not_yours_to_fix: string;
+  } | null;
   yellow_flags: Flag[];
   unanswered: { quote: string; asked_by: string; position: string }[];
   per_speaker: { speaker: string; verdict: Verdict; arithmetic: string; note: string }[];
@@ -146,6 +151,37 @@ export const ANALYSIS_TOOL = {
             "part_of_loop",
           ],
         },
+      },
+      your_side: {
+        type: ["object", "null"],
+        description:
+          "The requester's own conduct. Null when they were not a participant, or when safety is triggered. Suggestions must be framed as what gives them more footing, never as what would have changed the other person's behaviour.",
+        properties: {
+          worked: {
+            ...strArr,
+            description: "What they did that served them. Specific, quoted where possible.",
+          },
+          could_try: {
+            type: "array",
+            description:
+              "At most three. Empty is a real finding where their messages were reasonable throughout.",
+            items: {
+              type: "object",
+              properties: {
+                quote: str,
+                instead: { ...str, description: "A different move." },
+                why: { ...str, description: "Why it gives them more footing." },
+              },
+              required: ["quote", "instead", "why"],
+            },
+          },
+          not_yours_to_fix: {
+            ...str,
+            description:
+              "Required, never empty. Which parts of what happened were not within their control.",
+          },
+        },
+        required: ["worked", "could_try", "not_yours_to_fix"],
       },
       green_flags: {
         type: "array",
@@ -285,6 +321,7 @@ export const ANALYSIS_TOOL = {
       "summary",
       "loop",
       "findings",
+      "your_side",
       "green_flags",
       "yellow_flags",
       "unanswered",
