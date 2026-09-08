@@ -5,7 +5,7 @@ import { ANALYSIS_TOOL } from "@/lib/schema";
 
 export const maxDuration = 300;
 
-const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5";
+const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5";
 const MAX_IMAGES = 20;
 const MAX_TEXT_CHARS = 200_000;
 const MAX_TOTAL_IMAGE_BYTES = 24 * 1024 * 1024;
